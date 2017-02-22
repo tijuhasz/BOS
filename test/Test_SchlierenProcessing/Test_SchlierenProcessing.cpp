@@ -29,7 +29,10 @@ namespace BOS
 				bos_shared_ptr<BOS::imageProcessing::SchlierenSettings> bosSettings = 
 				bos_make_shared<BOS::imageProcessing::SchlierenSettings>();
 				std::cout << "Set compareAll property of BOS schlieren processing settings to true\n";
-				bosSettings->compareAll = false;
+				bosSettings->compareAll = true; // false = do not check all possible matches, stop comparison at first good-enough match
+				bosSettings->boxW = 8; // width of the comparison box
+				bosSettings->boxH = 1; // height of the comparison box
+				bosSettings->searchDist = 6; // distance in pixels to search around reference box in all directions (up, down, left, right)
 
 				std::cout << "Create BOS processing object\n";
 				BOS::imageProcessing::Schlieren bosProcessing(bosSettings);
