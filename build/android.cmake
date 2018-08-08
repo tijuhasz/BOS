@@ -1,0 +1,1 @@
+set(ENV{TESTDEF} "TESTDEF 1")

@@ -128,40 +128,45 @@ namespace BOS
 		}
 
 		void Schlieren::generateFinalImageSectionThread(uint32_t hBeg, uint32_t hEnd) {
+			try {
+				// iterate reference matrix in reference image
+				// wR, hR are current width and height values of upper left corner of reference matrix in reference image
+				int_least32_t wBeg = m_settings->searchDist;
+				int_least32_t wEnd = m_referenceImage->getWidth() - m_settings->searchDist - m_settings->boxW;
 
-			// iterate reference matrix in reference image
-			// wR, hR are current width and height values of upper left corner of reference matrix in reference image
-			int_least32_t wBeg = m_settings->searchDist;
-			int_least32_t wEnd = m_referenceImage->getWidth() - m_settings->searchDist - m_settings->boxW;
+				// refCoord holds the current width and height values of upper left corner of reference matrix in reference image
+				bos_shared_ptr<BOS::imageHandling::Coordinate> refCoord = bos_make_shared<BOS::imageHandling::Coordinate>
+					(0,0);
 
-			// refCoord holds the current width and height values of upper left corner of reference matrix in reference image
-			bos_shared_ptr<BOS::imageHandling::Coordinate> refCoord = bos_make_shared<BOS::imageHandling::Coordinate>
-				(0,0);
+				for (int_least32_t hRef = hBeg; hRef < hEnd; hRef += m_settings->boxH) {
+					sendProgressPercent((hRef-hBeg) * 100 / (hEnd-hBeg));
+					for (int_least32_t wRef = wBeg; wRef < wEnd; wRef += m_settings->boxW) {
+						refCoord->setCoord(wRef, hRef);
+						// iterate process matrix around position of reference matrix
+						bool notFound = true;
+						uint32_t minResult = INT32_MAX;
+						int_least32_t wOffset = 0; // width offset where match is found
+						int_least32_t hOffset = 0; // height offset where match is found
 
-			for (int_least32_t hRef = hBeg; hRef < hEnd; hRef += m_settings->boxH) {
-				sendProgressPercent((hRef-hBeg) * 100 / (hEnd-hBeg));
-				for (int_least32_t wRef = wBeg; wRef < wEnd; wRef += m_settings->boxW) {
-					refCoord->setCoord(wRef, hRef);
-					// iterate process matrix around position of reference matrix
-					bool notFound = true;
-					uint32_t minResult = INT32_MAX;
-					int_least32_t wOffset = 0; // width offset where match is found
-					int_least32_t hOffset = 0; // height offset where match is found
-
-					for (uint16_t curOffset = 0; curOffset < m_offsetVector.size() && notFound; ++curOffset)
-					{
-						uint32_t result = compareMatrices(wRef, hRef, wRef + m_offsetVector[curOffset].w, hRef + m_offsetVector[curOffset].h );
-						if (result < minResult)
+						for (uint16_t curOffset = 0; curOffset < m_offsetVector.size() && notFound; ++curOffset)
 						{
-							minResult = result;
-							wOffset = m_offsetVector[curOffset].w;
-							hOffset = m_offsetVector[curOffset].h;
-							if (!m_settings->compareAll && minResult < m_settings->matchThreshold) notFound = false; // found a good-enough match so stop searching
+							uint32_t result = compareMatrices(wRef, hRef, wRef + m_offsetVector[curOffset].w, hRef + m_offsetVector[curOffset].h );
+							if (result < minResult)
+							{
+								minResult = result;
+								wOffset = m_offsetVector[curOffset].w;
+								hOffset = m_offsetVector[curOffset].h;
+								if (!m_settings->compareAll && minResult < m_settings->matchThreshold) notFound = false; // found a good-enough match so stop searching
+							}
 						}
-					}
 
-					if (minResult < m_settings->matchThreshold) colorFinalImageAt(wRef, hRef, wOffset, hOffset);
+						if (minResult < m_settings->matchThreshold) colorFinalImageAt(wRef, hRef, wOffset, hOffset);
+					}
 				}
+			} catch (std::exception& e) {
+					std::cout << "EXCEPTION: " << e.what() << std::endl;
+			} catch (...) {
+					std::cout << "Unknown EXCEPTION " << std::endl;
 			}
 			return;
 		}
@@ -202,7 +207,7 @@ namespace BOS
 			//	sendProgressPercent(wRef * 100 / m_referenceImage->getWidth());
 			//}
 
-			std::cout << "generateFinalImage() is deprecated";
+			std::cout << "Function generateFinalImage() is deprecated" << std::endl;
 			return;
 		}
 

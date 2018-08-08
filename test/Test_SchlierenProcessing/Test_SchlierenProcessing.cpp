@@ -29,9 +29,9 @@ namespace BOS
 				bos_shared_ptr<BOS::imageProcessing::SchlierenSettings> bosSettings = 
 				bos_make_shared<BOS::imageProcessing::SchlierenSettings>();
 				std::cout << "Set compareAll property of BOS schlieren processing settings to true\n";
-				bosSettings->compareAll = true; // false = do not check all possible matches, stop comparison at first good-enough match
+				bosSettings->compareAll = false; // false = do not check all possible matches, stop comparison at first good-enough match
 				bosSettings->boxW = 8; // width of the comparison box
-				bosSettings->boxH = 1; // height of the comparison box
+				bosSettings->boxH = 2; // height of the comparison box
 				bosSettings->searchDist = 6; // distance in pixels to search around reference box in all directions (up, down, left, right)
 
 				std::cout << "Create BOS processing object\n";
@@ -44,12 +44,13 @@ namespace BOS
 				std::cout << "Generate final image based on reference image and process image\n";
 				std::cout << "Progress:\n";
 
-				//boost::posix_time::ptime startTime = boost::posix_time::microsec_clock::local_time();
-				//bosProcessing.generateFinalImage();
+				boost::posix_time::ptime startTime = boost::posix_time::microsec_clock::local_time();
+
 				bosProcessing.launchSchlierenProcessingInCpuThreads();
-				//boost::posix_time::ptime endTime = boost::posix_time::microsec_clock::local_time();
-				//boost::posix_time::time_duration elapsed = endTime - startTime;
-				//std::cout << "Processing took: " << elapsed.total_seconds() << " seconds\n";
+
+				boost::posix_time::ptime endTime = boost::posix_time::microsec_clock::local_time();
+				boost::posix_time::time_duration elapsed = endTime - startTime;
+				std::cout << "Processing took: " << elapsed.total_seconds() << " seconds\n";
 
 				std::cout << "Create image file from final image\n";
 				BOS::imageHandling::BitmapImage::createImageFile(resultingImage, bosProcessing.getFinalImage());

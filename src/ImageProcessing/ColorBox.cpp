@@ -95,16 +95,18 @@ namespace BOS
 			return m_colorData;
 		}
 
-		const bos_shared_ptr<BOS::imageHandling::Pixel> ColorBox::getPixelAtAbsCoord(uint16_t w, uint16_t h) const
+		const bos_shared_ptr<BOS::imageHandling::Pixel> ColorBox::getPixelAtAbsCoord(uint16_t width, uint16_t height) const
 		{
-			if (0 > w || w >= m_size) { 
-				BOS::Utilities::BOSException e(DEBUG_INFO + "Width value out of range, " + std::to_string(w) + " given." ); throw e; }
-			if (0 > h || h >= m_size) { BOS::Utilities::BOSException e(DEBUG_INFO + "Height value out of range:, " + std::to_string(h) + " given." ); throw e; }
+			if (0 > width || width >= m_size) { 
+				BOS::Utilities::BOSException e(DEBUG_INFO + "Width value out of range, " + std::to_string(width) + " given." ); throw e; }
+			if (0 > height || height >= m_size) { BOS::Utilities::BOSException e(DEBUG_INFO + "Height value out of range:, " + std::to_string(height) + " given." ); throw e; }
 
-			return m_colorData->getPixel(w, h);
+			return m_colorData->getPixel(width, height);
 		}
 
-		const bos_shared_ptr<BOS::imageHandling::Pixel> ColorBox::getPixelFromMiddle(int_least32_t wOffsetFromMiddle, int_least32_t hOffsetFromMiddle) const
+		const bos_shared_ptr<BOS::imageHandling::Pixel> ColorBox::getPixelFromMiddle(
+			int_least32_t wOffsetFromMiddle, 
+			int_least32_t hOffsetFromMiddle) const
 		{
 			uint16_t middle = m_size/2; // if m_size is even, m_size/2 + h (=m_size/2) can be out of range of vector
 
@@ -112,10 +114,14 @@ namespace BOS
 			int_least32_t absCoordH = hOffsetFromMiddle + middle;
 
 			if (0 > absCoordW || absCoordW > m_size) { 
-				BOS::Utilities::BOSException e(DEBUG_INFO + "Width value out of range, " + std::to_string(hOffsetFromMiddle) + " given." ); throw e; 
+				BOS::Utilities::BOSException e(DEBUG_INFO + "Width value out of range, " + 
+											   std::to_string(wOffsetFromMiddle) + " given." ); 
+				throw e; 
 			}
 			if (0 > absCoordH || absCoordH > m_size) { 
-				BOS::Utilities::BOSException e(DEBUG_INFO + "Height value out of range:, " + std::to_string(hOffsetFromMiddle) + " given." ); throw e; 
+				BOS::Utilities::BOSException e(DEBUG_INFO + "Height value out of range:, " + 
+											   std::to_string(hOffsetFromMiddle) + " given." ); 
+				throw e; 
 			}
 
 			return m_colorData->getPixel(absCoordW, absCoordH);
